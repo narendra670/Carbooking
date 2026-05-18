@@ -1,0 +1,11 @@
+{
+  "name": "carbooking-platform",
+  "version": "1.0.0",
+  "description": "Full-stack car booking platform with AI suggestions, budget recommendations, and car comparison",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm start",
+    "dev": "start /b npm run backend && npm run frontend"
+  }
+}
