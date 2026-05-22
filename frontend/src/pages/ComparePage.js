@@ -10,6 +10,8 @@ const ComparePage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showSearch, setShowSearch] = useState(false);
+  const [compareError, setCompareError] = useState('');
+  const [searchError, setSearchError] = useState('');
 
   const addToCompare = async (carId) => {
     if (selectedCars.length >= 2) return;
@@ -20,11 +22,12 @@ const ComparePage = () => {
 
     if (newSelected.length === 2) {
       setLoading(true);
+      setCompareError('');
       try {
         const { data } = await carsAPI.compare(newSelected[0], newSelected[1]);
         setComparison(data);
       } catch (error) {
-        console.error('Error comparing cars:', error);
+        setCompareError('Failed to compare cars. Make sure the backend server is running.');
       }
       setLoading(false);
     }
@@ -33,16 +36,18 @@ const ComparePage = () => {
   const removeFromCompare = (carId) => {
     setSelectedCars(prev => prev.filter(id => id !== carId));
     setComparison(null);
+    setCompareError('');
   };
 
   const handleSearch = async () => {
     if (!searchTerm) return;
+    setSearchError('');
     try {
       const { data } = await carsAPI.search({ query: searchTerm });
       setSearchResults(data);
       setShowSearch(true);
     } catch (error) {
-      console.error('Search error:', error);
+      setSearchError('Search failed. Make sure the backend server is running.');
     }
   };
 
@@ -102,6 +107,19 @@ const ComparePage = () => {
           </div>
         )}
 
+        {showSearch && searchResults.length === 0 && !searchError && (
+          <div className="bg-white rounded-xl shadow-md p-6 mb-6 text-center">
+            <p className="text-gray-500">No cars found for "{searchTerm}"</p>
+          </div>
+        )}
+
+        {searchError && (
+          <div className="bg-white rounded-xl shadow-md p-6 mb-6 text-center">
+            <p className="text-red-500 mb-2">{searchError}</p>
+            <button onClick={handleSearch} className="text-primary-600 font-medium hover:underline">Retry</button>
+          </div>
+        )}
+
         {selectedCars.length > 0 && (
           <div className="flex gap-2 mb-6 flex-wrap">
             <span className="text-gray-600 font-medium self-center">Selected:</span>
@@ -119,7 +137,14 @@ const ComparePage = () => {
           <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div></div>
         )}
 
-        {comparison && (
+        {compareError && !loading && (
+          <div className="text-center py-10 bg-white rounded-xl shadow-md mb-6">
+            <p className="text-red-500 mb-2">{compareError}</p>
+            <button onClick={() => { setSelectedCars([]); setComparison(null); setCompareError(''); }} className="text-primary-600 font-medium hover:underline">Clear & Try Again</button>
+          </div>
+        )}
+
+        {comparison && comparison.car1 && comparison.car2 && (
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
             <div className="grid grid-cols-3 bg-gray-50">
               <div className="p-4"></div>
@@ -134,9 +159,9 @@ const ComparePage = () => {
             </div>
             <div className="divide-y">
               {specs.map(spec => {
-                const val1 = getValue(comparison.car1, spec);
-                const val2 = getValue(comparison.car2, spec);
-                const better = isBetter(spec.key, comparison.car1[spec.key], comparison.car2[spec.key]);
+                const val1 = comparison.car1 ? getValue(comparison.car1, spec) : 'N/A';
+                const val2 = comparison.car2 ? getValue(comparison.car2, spec) : 'N/A';
+                const better = comparison.car1 && comparison.car2 ? isBetter(spec.key, comparison.car1[spec.key], comparison.car2[spec.key]) : null;
                 return (
                   <div key={spec.label} className="grid grid-cols-3">
                     <div className="p-4 font-medium text-gray-700 bg-gray-50">{spec.label}</div>
@@ -149,7 +174,7 @@ const ComparePage = () => {
           </div>
         )}
 
-        {!comparison && !loading && (
+        {!comparison && !compareError && !loading && (
           <div className="text-center py-20 bg-white rounded-xl shadow-md">
             <p className="text-gray-500 text-lg">Select 2 cars to compare their specifications</p>
             <Link to="/cars" className="mt-4 inline-block text-primary-600 font-medium">Browse Cars</Link>

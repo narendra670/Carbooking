@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { carsAPI } from '../services/api';
 import CarCard from '../components/CarCard';
 
@@ -7,6 +7,7 @@ const CarsListingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [filters, setFilters] = useState({
     brand: searchParams.get('brand') || '',
     fuelType: searchParams.get('fuelType') || '',
@@ -18,22 +19,23 @@ const CarsListingPage = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  useEffect(() => {
-    fetchCars();
-  }, [searchParams]);
-
-  const fetchCars = async () => {
+  const fetchCars = useCallback(async () => {
     setLoading(true);
+    setError('');
     try {
       const params = {};
       Object.entries(filters).forEach(([key, value]) => { if (value) params[key] = value; });
       const { data } = await carsAPI.getAll(params);
       setCars(data);
     } catch (error) {
-      console.error('Error fetching cars:', error);
+      setError('Failed to load cars. Make sure the backend server is running.');
     }
     setLoading(false);
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    fetchCars();
+  }, [fetchCars]);
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -64,7 +66,7 @@ const CarsListingPage = () => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
               Filters {activeFilterCount > 0 && <span className="bg-primary-500 text-white text-xs px-2 py-0.5 rounded-full">{activeFilterCount}</span>}
             </button>
-            <select value={filters.sort} onChange={(e) => { handleFilterChange('sort', e.target.value); }} className="border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary-500">
+            <select value={filters.sort} onChange={(e) => handleFilterChange('sort', e.target.value)} className="border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary-500">
               <option value="">Sort By</option>
               <option value="price-low">Price: Low to High</option>
               <option value="price-high">Price: High to Low</option>
@@ -127,6 +129,11 @@ const CarsListingPage = () => {
 
         {loading ? (
           <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div></div>
+        ) : error ? (
+          <div className="text-center py-20">
+            <p className="text-red-500 text-lg mb-2">{error}</p>
+            <button onClick={() => window.location.reload()} className="text-primary-600 font-medium hover:underline">Retry</button>
+          </div>
         ) : cars.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-gray-500 text-lg">No cars found matching your criteria</p>

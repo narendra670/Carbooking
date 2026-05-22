@@ -7,24 +7,29 @@ const PaymentPage = () => {
   const navigate = useNavigate();
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     const fetchBooking = async () => {
       try {
+        setError('');
         const { data } = await bookingsAPI.getBooking(id);
         setBooking(data);
       } catch (error) {
-        console.error('Error fetching booking:', error);
-        navigate('/dashboard');
+        setError('Failed to load booking details. Make sure the backend server is running.');
       }
       setLoading(false);
     };
     fetchBooking();
-  }, [id, navigate]);
+  }, [id]);
 
   if (loading) {
     return <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div></div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-20"><p className="text-red-500 text-lg mb-2">{error}</p><button onClick={() => window.location.reload()} className="text-primary-600 font-medium hover:underline">Retry</button></div>;
   }
 
   if (!booking) return null;
@@ -54,14 +59,14 @@ const PaymentPage = () => {
             <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-10 h-10 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-800">₹{booking.totalAmount.toLocaleString()}</h2>
-            <p className="text-gray-500">Booking #{booking._id.slice(-6)}</p>
+            <h2 className="text-2xl font-bold text-gray-800">₹{(booking.totalAmount || 0).toLocaleString()}</h2>
+            <p className="text-gray-500">Booking #{booking._id ? booking._id.slice(-6) : 'N/A'}</p>
           </div>
 
           <div className="space-y-3 mb-6">
             <div className="flex justify-between py-2 border-b">
               <span className="text-gray-600">Car</span>
-              <span className="font-medium">{booking.car.oem} {booking.car.model}</span>
+              <span className="font-medium">{booking.car?.oem || 'N/A'} {booking.car?.model || ''}</span>
             </div>
             <div className="flex justify-between py-2 border-b">
               <span className="text-gray-600">Pickup</span>
@@ -73,12 +78,12 @@ const PaymentPage = () => {
             </div>
             <div className="flex justify-between py-2 border-b">
               <span className="text-gray-600">Days</span>
-              <span className="font-medium">{booking.totalDays}</span>
+              <span className="font-medium">{booking.totalDays || 0}</span>
             </div>
             {booking.withDriver && (
               <div className="flex justify-between py-2 border-b">
                 <span className="text-gray-600">Driver</span>
-                <span className="font-medium">₹{booking.driverCharge.toLocaleString()}</span>
+                <span className="font-medium">₹{(booking.driverCharge || 0).toLocaleString()}</span>
               </div>
             )}
           </div>

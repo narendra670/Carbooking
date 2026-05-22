@@ -9,14 +9,16 @@ const CarDetailsPage = () => {
   const { user, toggleWishlist } = useAuth();
   const [car, setCar] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchCar = async () => {
       try {
+        setError('');
         const { data } = await carsAPI.getById(id);
         setCar(data);
       } catch (error) {
-        console.error('Error fetching car:', error);
+        setError('Failed to load car details. Make sure the backend server is running.');
       }
       setLoading(false);
     };
@@ -31,6 +33,10 @@ const CarDetailsPage = () => {
 
   if (loading) {
     return <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div></div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-20"><p className="text-red-500 text-lg mb-2">{error}</p><button onClick={() => window.location.reload()} className="text-primary-600 font-medium hover:underline">Retry</button><Link to="/cars" className="ml-4 text-primary-600 font-medium hover:underline">Back to Cars</Link></div>;
   }
 
   if (!car) {
@@ -88,9 +94,9 @@ const CarDetailsPage = () => {
             <div className="mt-6">
               <h3 className="font-semibold text-gray-800 mb-3">Features</h3>
               <div className="flex flex-wrap gap-2">
-                {car.features.map((f, i) => (
+                {car.features && car.features.length > 0 ? car.features.map((f, i) => (
                   <span key={i} className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">{f}</span>
-                ))}
+                )) : <span className="text-gray-400 text-sm">No features listed</span>}
               </div>
             </div>
 

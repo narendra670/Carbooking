@@ -4,20 +4,23 @@ import { carsAPI } from '../services/api';
 import CarCard from '../components/CarCard';
 import BudgetRecommendation from '../components/BudgetRecommendation';
 import AISuggestion from '../components/AISuggestion';
+import { useAuth } from '../context/AuthContext';
 
 const HomePage = () => {
+  const { user } = useAuth();
   const [featuredCars, setFeaturedCars] = useState([]);
   const [searchCity, setSearchCity] = useState('');
   const [searchDate, setSearchDate] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
         const { data } = await carsAPI.getAll({ sort: 'price-low' });
-        setFeaturedCars(data.slice(0, 6));
+        setFeaturedCars(Array.isArray(data) ? data.slice(0, 6) : []);
       } catch (error) {
-        console.error('Error fetching cars:', error);
+        setError('Failed to load featured cars.');
       }
       setLoading(false);
     };
@@ -80,6 +83,24 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Quick Links */}
+      <section className="py-8 bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link to="/cars" className="flex items-center gap-2 bg-primary-50 text-primary-700 px-6 py-3 rounded-xl font-medium hover:bg-primary-100 transition">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              Browse All Cars
+            </Link>
+            {user?.role === 'admin' && (
+              <Link to="/admin" className="flex items-center gap-2 bg-purple-50 text-purple-700 px-6 py-3 rounded-xl font-medium hover:bg-purple-100 transition">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                Admin Dashboard
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* Featured Cars */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -89,6 +110,15 @@ const HomePage = () => {
           </div>
           {loading ? (
             <div className="flex justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div></div>
+          ) : error ? (
+            <div className="text-center py-10">
+              <p className="text-red-500 mb-2">{error}</p>
+              <button onClick={() => window.location.reload()} className="text-primary-600 font-medium hover:underline">Retry</button>
+            </div>
+          ) : featuredCars.length === 0 ? (
+            <div className="text-center py-10">
+              <p className="text-gray-500">No featured cars available</p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredCars.map(car => <CarCard key={car.used_car_sku_id} car={car} />)}

@@ -29,6 +29,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/compare" element={<ComparePage />} />
+
         </Routes>
       </main>
       <Footer />

@@ -7,15 +7,17 @@ const DashboardPage = () => {
   const { user } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('active');
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
+        setError('');
         const { data } = await bookingsAPI.getUserBookings();
         setBookings(data);
       } catch (error) {
-        console.error('Error fetching bookings:', error);
+        setError('Failed to load bookings. Make sure the backend server is running.');
       }
       setLoading(false);
     };
@@ -79,6 +81,11 @@ const DashboardPage = () => {
 
         {loading ? (
           <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div></div>
+        ) : error ? (
+          <div className="text-center py-20 bg-white rounded-xl shadow-md">
+            <p className="text-red-500 text-lg mb-2">{error}</p>
+            <button onClick={() => window.location.reload()} className="text-primary-600 font-medium hover:underline">Retry</button>
+          </div>
         ) : filteredBookings.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-xl shadow-md">
             <p className="text-gray-500 text-lg">No bookings found</p>
@@ -90,11 +97,11 @@ const DashboardPage = () => {
               <div key={booking._id} className="bg-white rounded-xl shadow-md p-6">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div className="flex items-center gap-4">
-                    <img src={booking.car.image || '/placeholder-car.jpg'} alt={booking.car.model} className="w-24 h-24 object-cover rounded-lg" />
+                    <img src={booking.car?.image || '/placeholder-car.jpg'} alt={booking.car?.model || 'Car'} className="w-24 h-24 object-cover rounded-lg" />
                     <div>
-                      <h3 className="text-lg font-bold text-gray-800">{booking.car.oem} {booking.car.model}</h3>
+                      <h3 className="text-lg font-bold text-gray-800">{booking.car?.oem || 'N/A'} {booking.car?.model || ''}</h3>
                       <p className="text-gray-500">{new Date(booking.pickupDate).toLocaleDateString()} - {new Date(booking.returnDate).toLocaleDateString()}</p>
-                      <p className="text-sm text-gray-500">{booking.totalDays} days {booking.withDriver && '• With Driver'}</p>
+                      <p className="text-sm text-gray-500">{booking.totalDays || 0} days {booking.withDriver && '• With Driver'}</p>
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2">
@@ -104,9 +111,9 @@ const DashboardPage = () => {
                       booking.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                       'bg-blue-100 text-blue-700'
                     }`}>
-                      {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                      {booking.status ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1) : 'N/A'}
                     </span>
-                    <span className="text-xl font-bold text-primary-600">₹{booking.totalAmount.toLocaleString()}</span>
+                    <span className="text-xl font-bold text-primary-600">₹{(booking.totalAmount || 0).toLocaleString()}</span>
                     {(booking.status === 'pending' || booking.status === 'confirmed') && (
                       <button onClick={() => handleCancel(booking._id)} className="text-red-500 text-sm font-medium hover:text-red-600">Cancel Booking</button>
                     )}

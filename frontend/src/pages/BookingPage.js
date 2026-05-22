@@ -9,6 +9,7 @@ const BookingPage = () => {
   const { user } = useAuth();
   const [car, setCar] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [bookingData, setBookingData] = useState({
     pickupDate: '',
     returnDate: '',
@@ -19,10 +20,11 @@ const BookingPage = () => {
   useEffect(() => {
     const fetchCar = async () => {
       try {
+        setError('');
         const { data } = await carsAPI.getById(id);
         setCar(data);
       } catch (error) {
-        console.error('Error fetching car:', error);
+        setError('Failed to load car details. Make sure the backend server is running.');
       }
       setLoading(false);
     };
@@ -34,8 +36,16 @@ const BookingPage = () => {
     return null;
   }
 
-  if (loading || !car) {
+  if (loading) {
     return <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div></div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-20"><p className="text-red-500 text-lg mb-2">{error}</p><button onClick={() => window.location.reload()} className="text-primary-600 font-medium hover:underline">Retry</button></div>;
+  }
+
+  if (!car) {
+    return <div className="text-center py-20"><p className="text-gray-500 text-lg">Car not found</p></div>;
   }
 
   const handleChange = (e) => {
