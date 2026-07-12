@@ -105,3 +105,22 @@ exports.searchCars = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+exports.getCarAvailability = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const Booking = require('../models/Booking');
+    const bookings = await Booking.find({
+      'car.used_car_sku_id': id,
+      status: { $in: ['pending', 'confirmed'] },
+    }).select('pickupDate returnDate status');
+    const bookedDates = bookings.map(b => ({
+      start: b.pickupDate,
+      end: b.returnDate,
+      status: b.status,
+    }));
+    res.json({ carId: id, bookedDates });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

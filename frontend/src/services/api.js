@@ -20,6 +20,7 @@ export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   getProfile: () => api.get('/auth/profile'),
   updateWishlist: (carId) => api.post('/auth/wishlist', { carId }),
+  getWishlist: () => api.get('/auth/wishlist'),
 };
 
 export const carsAPI = {
@@ -29,6 +30,7 @@ export const carsAPI = {
   getPurpose: (purpose) => api.get('/cars/purpose', { params: { purpose } }),
   compare: (car1, car2) => api.get('/cars/compare', { params: { car1, car2 } }),
   search: (params) => api.get('/cars/search', { params }),
+  getAvailability: (id) => api.get(`/cars/${id}/availability`),
 };
 
 export const bookingsAPI = {
@@ -39,6 +41,22 @@ export const bookingsAPI = {
   updatePayment: (id, data) => api.put(`/bookings/${id}/payment`, data),
   getAll: () => api.get('/bookings/admin/all'),
   updateStatus: (id, data) => api.put(`/bookings/admin/${id}/status`, data),
+  getBookingStatus: (id) => api.get(`/bookings/${id}/status`),
+  assignDriver: (id, data) => api.put(`/bookings/${id}/assign-driver`, data),
+};
+
+export const reviewsAPI = {
+  create: (data) => api.post('/reviews', data),
+  getCarReviews: (carId) => api.get(`/reviews/car/${carId}`),
+  getUserReviews: () => api.get('/reviews/user'),
+  delete: (id) => api.delete(`/reviews/${id}`),
+};
+
+export const driversAPI = {
+  getAvailable: () => api.get('/drivers/available'),
+  getById: (id) => api.get(`/drivers/${id}`),
+  getAll: () => api.get('/drivers/all'),
+  seed: () => api.post('/drivers/seed'),
 };
 
 export default api;

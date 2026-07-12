@@ -10,6 +10,7 @@ const bookingSchema = new mongoose.Schema({
     image: { type: String },
     year: { type: Number },
     bodyType: { type: String },
+    dailyRate: { type: Number },
   },
   pickupDate: { type: Date, required: true },
   returnDate: { type: Date, required: true },
@@ -23,6 +24,18 @@ const bookingSchema = new mongoose.Schema({
   razorpayOrderId: { type: String },
   razorpayPaymentId: { type: String },
   razorpaySignature: { type: String },
+  driverDetails: {
+    driverId: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver' },
+    name: { type: String },
+    phone: { type: String },
+    photo: { type: String },
+    rating: { type: Number },
+  },
+  bookingStatusTimeline: [{
+    step: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+    completed: { type: Boolean, default: false },
+  }],
 }, { timestamps: true });
 
 module.exports = mongoose.model('Booking', bookingSchema);

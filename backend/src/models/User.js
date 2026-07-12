@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   phone: { type: String },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
-  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Car' }],
+  wishlist: [String],
 }, { timestamps: true });
 
 userSchema.pre('save', async function(next) {

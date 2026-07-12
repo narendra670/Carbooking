@@ -90,12 +90,62 @@ exports.getAllBookings = async (req, res) => {
 exports.updateBookingStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const booking = await Booking.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
+    const booking = await Booking.findById(req.params.id);
     if (!booking) return res.status(404).json({ message: 'Booking not found' });
+    booking.status = status;
+    if (!booking.bookingStatusTimeline) booking.bookingStatusTimeline = [];
+    const stepNames = { pending: 'Booked', confirmed: 'Confirmed', completed: 'Completed', cancelled: 'Cancelled' };
+    const stepName = stepNames[status] || status;
+    const existingIdx = booking.bookingStatusTimeline.findIndex(t => t.step === stepName);
+    if (existingIdx >= 0) {
+      booking.bookingStatusTimeline[existingIdx].completed = true;
+      booking.bookingStatusTimeline[existingIdx].timestamp = new Date();
+    } else {
+      booking.bookingStatusTimeline.push({ step: stepName, timestamp: new Date(), completed: true });
+    }
+    const order = ['Booked', 'Confirmed', 'Driver Assigned', 'In Progress', 'Completed'];
+    booking.bookingStatusTimeline.forEach(t => {
+      if (t.step === stepName) return;
+      if (order.indexOf(stepName) >= order.indexOf(t.step)) {
+        t.completed = true;
+      }
+    });
+    await booking.save();
+    res.json(booking);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+exports.getBookingStatus = async (req, res) => {
+  try {
+    const booking = await Booking.findOne({ _id: req.params.id, user: req.user.id });
+    if (!booking) return res.status(404).json({ message: 'Booking not found' });
+    res.json({
+      _id: booking._id,
+      status: booking.status,
+      paymentStatus: booking.paymentStatus,
+      timeline: booking.bookingStatusTimeline || [],
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+exports.assignDriver = async (req, res) => {
+  try {
+    const { driverId, driverName, driverPhone, driverPhoto, driverRating } = req.body;
+    const booking = await Booking.findOne({ _id: req.params.id, user: req.user.id });
+    if (!booking) return res.status(404).json({ message: 'Booking not found' });
+    booking.driverDetails = {
+      driverId, name: driverName, phone: driverPhone, photo: driverPhoto, rating: driverRating,
+    };
+    if (!booking.bookingStatusTimeline) booking.bookingStatusTimeline = [];
+    const exists = booking.bookingStatusTimeline.find(t => t.step === 'Driver Assigned');
+    if (!exists) {
+      booking.bookingStatusTimeline.push({ step: 'Driver Assigned', timestamp: new Date(), completed: true });
+    }
+    await booking.save();
     res.json(booking);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

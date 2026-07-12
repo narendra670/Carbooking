@@ -6,6 +6,7 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const wishlistCount = user?.wishlist?.length || 0;
 
   const handleLogout = () => {
     logout();
@@ -19,7 +20,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2">
             <span className="text-2xl font-bold text-primary-700">Car</span>
-            <span className="text-2xl font-bold text-accent-500">Book</span>
+            <span className="text-2xl font-bold text-primary-700">Book</span>
           </Link>
 
           <div className="hidden md:flex items-center space-x-6">
@@ -28,6 +29,13 @@ const Navbar = () => {
             <Link to="/compare" className="text-gray-700 hover:text-primary-600 font-medium transition">Compare</Link>
             {user ? (
               <>
+                <Link to="/wishlist" className="relative text-gray-700 hover:text-primary-600 font-medium transition flex items-center gap-1">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                  Wishlist
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">{wishlistCount}</span>
+                  )}
+                </Link>
                 {user.role === 'admin' && (
                   <Link to="/admin" className="text-gray-700 hover:text-primary-600 font-medium transition">Admin</Link>
                 )}
@@ -60,6 +68,9 @@ const Navbar = () => {
             <Link to="/compare" onClick={() => setMenuOpen(false)} className="block py-2 text-gray-700 hover:text-primary-600">Compare</Link>
             {user ? (
               <>
+                <Link to="/wishlist" onClick={() => setMenuOpen(false)} className="block py-2 text-gray-700 hover:text-primary-600">
+                  Wishlist {wishlistCount > 0 && <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">{wishlistCount}</span>}
+                </Link>
                 {user.role === 'admin' && (
                   <Link to="/admin" onClick={() => setMenuOpen(false)} className="block py-2 text-gray-700 hover:text-primary-600">Admin</Link>
                 )}

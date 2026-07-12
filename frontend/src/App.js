@@ -12,6 +12,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import ComparePage from './pages/ComparePage';
+import WishlistPage from './pages/WishlistPage';
 
 function App() {
   return (
@@ -29,7 +30,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/compare" element={<ComparePage />} />
-
+          <Route path="/wishlist" element={<WishlistPage />} />
         </Routes>
       </main>
       <Footer />

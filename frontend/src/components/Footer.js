@@ -8,8 +8,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-2xl font-bold mb-4">
-              <span className="text-primary-400">Car</span>
-              <span className="text-accent-400">Book</span>
+              <span className="text-primary-700">Car</span>
+              <span className="text-primary-700">Book</span>
             </h3>
             <p className="text-gray-400">Your trusted platform for car bookings. Browse, compare, and book your perfect ride.</p>
           </div>
