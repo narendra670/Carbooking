@@ -1,4 +1,5 @@
 import axios from 'axios';
+import fallbackCars from './fallbackCars';
 
 const PRODUCTION_API_URL = 'https://carbooking-1-clao.onrender.com/api';
 
@@ -36,13 +37,84 @@ export const authAPI = {
 };
 
 export const carsAPI = {
-  getAll: (params) => api.get('/cars', { params }),
-  getById: (id) => api.get(`/cars/${id}`),
-  getBudget: (budget) => api.get('/cars/budget', { params: { budget } }),
-  getPurpose: (purpose) => api.get('/cars/purpose', { params: { purpose } }),
-  compare: (car1, car2) => api.get('/cars/compare', { params: { car1, car2 } }),
-  search: (params) => api.get('/cars/search', { params }),
-  getAvailability: (id) => api.get(`/cars/${id}/availability`),
+  getAll: async (params) => {
+    try {
+      return await api.get('/cars', { params });
+    } catch (error) {
+      console.warn('Backend API failed, using fallback cars on frontend.', error);
+      let filtered = fallbackCars;
+      if (params) {
+        if (params.brand) filtered = filtered.filter(c => c.oem.toLowerCase().includes(params.brand.toLowerCase()));
+        if (params.search) filtered = filtered.filter(c => c.model.toLowerCase().includes(params.search.toLowerCase()) || c.oem.toLowerCase().includes(params.search.toLowerCase()));
+        if (params.minPrice) filtered = filtered.filter(c => c.dailyRate >= Number(params.minPrice));
+        if (params.maxPrice) filtered = filtered.filter(c => c.dailyRate <= Number(params.maxPrice));
+      }
+      return { data: filtered };
+    }
+  },
+  getById: async (id) => {
+    try {
+      return await api.get(`/cars/${id}`);
+    } catch (error) {
+      console.warn('Backend API failed, using fallback car on frontend.', error);
+      const car = fallbackCars.find(c => c.used_car_sku_id === id);
+      if (car) return { data: car };
+      throw error;
+    }
+  },
+  getBudget: async (budget) => {
+    try {
+      return await api.get('/cars/budget', { params: { budget } });
+    } catch (error) {
+      console.warn('Backend API failed, using fallback cars on frontend.', error);
+      const filtered = fallbackCars.filter(c => c.dailyRate <= budget).sort((a, b) => a.dailyRate - b.dailyRate);
+      return { data: filtered };
+    }
+  },
+  getPurpose: async (purpose) => {
+    try {
+      return await api.get('/cars/purpose', { params: { purpose } });
+    } catch (error) {
+      console.warn('Backend API failed, using fallback cars on frontend.', error);
+      let bodyTypes = [];
+      if (purpose.toLowerCase() === 'family trip') bodyTypes = ['SUV'];
+      else if (purpose.toLowerCase() === 'office work') bodyTypes = ['Sedan'];
+      else if (purpose.toLowerCase() === 'solo travel') bodyTypes = ['Hatchback'];
+      const filtered = fallbackCars.filter(c => bodyTypes.includes(c.bodyType));
+      return { data: filtered };
+    }
+  },
+  compare: async (car1, car2) => {
+    try {
+      return await api.get('/cars/compare', { params: { car1, car2 } });
+    } catch (error) {
+      console.warn('Backend API failed, using fallback cars on frontend.', error);
+      const c1 = fallbackCars.find(c => c.used_car_sku_id === car1);
+      const c2 = fallbackCars.find(c => c.used_car_sku_id === car2);
+      return { data: { car1: c1, car2: c2 } };
+    }
+  },
+  search: async (params) => {
+    try {
+      return await api.get('/cars/search', { params });
+    } catch (error) {
+      console.warn('Backend API failed, using fallback cars on frontend.', error);
+      let filtered = fallbackCars;
+      if (params && params.query) {
+        const q = params.query.toLowerCase();
+        filtered = filtered.filter(c => c.model.toLowerCase().includes(q) || c.oem.toLowerCase().includes(q) || c.bodyType.toLowerCase().includes(q));
+      }
+      return { data: filtered };
+    }
+  },
+  getAvailability: async (id) => {
+    try {
+      return await api.get(`/cars/${id}/availability`);
+    } catch (error) {
+      console.warn('Backend API failed, assuming car is available.', error);
+      return { data: { available: true } };
+    }
+  },
 };
 
 export const bookingsAPI = {
