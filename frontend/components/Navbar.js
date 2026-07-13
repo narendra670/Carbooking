@@ -33,8 +33,8 @@ export default function Navbar() {
             <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center shadow-md">
               <BiCar className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-dark-900">
-              Car<span className="text-primary-600">Go</span>
+            <span className="text-xl font-bold text-primary-600">
+              CarBook
             </span>
           </Link>
 

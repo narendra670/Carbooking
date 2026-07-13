@@ -36,8 +36,7 @@ const SignupPage = () => {
         <div className="bg-white rounded-xl shadow-md p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800">
-              <span className="text-primary-700">Car</span>
-              <span className="text-accent-500">Book</span>
+              <span className="text-primary-600">CarBook</span>
             </h1>
             <p className="text-gray-500 mt-2">Create your account</p>
           </div>

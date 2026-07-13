@@ -4,18 +4,18 @@ import Image from "next/image"
 import Link from "next/link"
 
 const images = [
-  "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80",
-  "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&q=80",
-  "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&q=80",
-  "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&q=80",
-  "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&q=80",
-  "https://images.unsplash.com/photo-1504215680853-026ed3a45a5b?w=800&q=80",
-  "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&q=80",
-  "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?w=800&q=80",
-  "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800&q=80",
-  "https://images.unsplash.com/photo-1554744511-5d294d3c9e8f?w=800&q=80",
-  "https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?w=800&q=80",
-  "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&q=80",
+  "/hero-car.jpg",
+  "/car-1.jpg",
+  "/car-2.jpg",
+  "/car-3.jpg",
+  "/about-car.jpg",
+  "/car-1.jpg",
+  "/car-2.jpg",
+  "/car-3.jpg",
+  "/hero-car.jpg",
+  "/about-car.jpg",
+  "/car-1.jpg",
+  "/car-2.jpg",
 ]
 
 const milestones = [

@@ -70,7 +70,8 @@ export default function LoginPage() {
             <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary-500/30">
               <BiCar className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-3xl font-bold text-dark-900">Sign In</h2>
+            <h2 className="text-3xl font-bold text-primary-600 mb-1">CarBook</h2>
+            <h3 className="text-2xl font-bold text-dark-900">Sign In</h3>
             <p className="text-dark-500 mt-2">Enter your credentials to access your account</p>
           </div>
 
@@ -117,11 +118,7 @@ export default function LoginPage() {
             </Link>
           </p>
 
-          <div className="mt-8 p-4 bg-dark-100 rounded-xl">
-            <p className="text-sm font-semibold text-dark-700 mb-2">Demo Credentials:</p>
-            <p className="text-xs text-dark-500">User: user@test.com / user123</p>
-            <p className="text-xs text-dark-500">Admin: admin@carbooking.com / admin123</p>
-          </div>
+
         </div>
       </div>
     </div>

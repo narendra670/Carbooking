@@ -50,7 +50,7 @@ export default function RegisterPage() {
           <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-8">
             <BiCar className="w-8 h-8" />
           </div>
-          <h1 className="text-4xl font-bold mb-4">Join CarGo Today</h1>
+          <h1 className="text-4xl font-bold mb-4">Join <span className="text-primary-200">CarBook</span> Today</h1>
           <p className="text-xl text-primary-100 leading-relaxed">
             Create your account and start booking premium vehicles instantly.
           </p>
@@ -79,7 +79,8 @@ export default function RegisterPage() {
             <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary-500/30">
               <BiCar className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-3xl font-bold text-dark-900">Create Account</h2>
+            <h2 className="text-3xl font-bold text-primary-600 mb-1">CarBook</h2>
+            <h3 className="text-2xl font-bold text-dark-900">Create Account</h3>
             <p className="text-dark-500 mt-2">Fill in your details to get started</p>
           </div>
 

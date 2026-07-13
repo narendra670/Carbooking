@@ -1,47 +1,28 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import carService from "@/services/carService"
+
 const image1 = "/hero-car.jpg"
-const image2 = "/car-1.jpg"
-const image3 = "/car-2.jpg"
-const image4 = "/car-3.jpg"
 const image5 = "/about-car.jpg"
 
-const featuredCars = [
-  {
-    id: 1,
-    name: "Premium Sedan",
-    brand: "Luxury Class",
-    image: image2,
-    seats: 5,
-    fuel: "Petrol",
-    transmission: "Automatic",
-    price: 3500,
-  },
-  {
-    id: 2,
-    name: "Premium Sedan",
-    brand: "Luxury Class",
-    image: image3,
-    seats: 5,
-    fuel: "Petrol",
-    transmission: "Automatic",
-    price: 3500,
-  },
-  {
-    id: 3,
-    name: "Premium Sedan",
-    brand: "Luxury Class",
-    image: image4,
-    seats: 5,
-    fuel: "Petrol",
-    transmission: "Automatic",
-    price: 3500,
-  },
-]
-
 export default function Home() {
+  const [featuredCars, setFeaturedCars] = useState([])
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const data = await carService.getAll()
+        setFeaturedCars(Array.isArray(data) ? data.slice(0, 3) : [])
+      } catch {
+        setFeaturedCars([])
+      }
+    }
+    fetchFeatured()
+  }, [])
+
   return (
     <div>
       <section className="relative bg-gradient-to-br from-dark-900 via-dark-800 to-primary-900 text-white overflow-hidden">
@@ -135,36 +116,55 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {featuredCars.map((car) => (
-              <div key={car.id} className="card group">
+            {featuredCars.length > 0 ? featuredCars.map((car) => (
+              <div key={car.used_car_sku_id} className="card group">
                 <div className="relative h-52 overflow-hidden bg-dark-100">
-                  <Image
-                    src={car.image}
-                    alt={`Featured car ${car.id}`}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+                  {car.image ? (
+                    <Image
+                      src={car.image}
+                      alt={`${car.oem} ${car.model}`}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-dark-100">
+                      <svg className="w-16 h-16 text-dark-300" fill="currentColor" viewBox="0 0 512 512">
+                        <path d="M499.99 176h-59.87l-16.64-41.6C406.38 91.63 365.57 64 319.5 64h-127c-46.06 0-86.88 27.63-103.99 70.4L71.87 176H12.01C4.2 176-1.53 183.34.37 190.91l6 24C7.7 220.25 12.5 224 18.01 224h20.07C24.65 235.73 16 252.78 16 272v48c0 16.12 6.16 30.67 16 41.93V416c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32v-32h256v32c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32v-54.07c9.84-11.25 16-25.8 16-41.93v-48c0-19.22-8.65-36.27-22.07-48H494c5.51 0 10.31-3.75 11.64-9.09l6-24c1.89-7.57-3.84-14.91-11.65-14.91z" />
+                      </svg>
+                    </div>
+                  )}
                   <div className="absolute top-3 left-3">
                     <span className="badge badge-success">Available</span>
                   </div>
                 </div>
                 <div className="p-5">
-                  <h3 className="text-lg font-semibold text-dark-900 mb-1">{car.name}</h3>
-                  <p className="text-sm text-dark-500 mb-3">{car.brand}</p>
+                  <h3 className="text-lg font-semibold text-dark-900 mb-1">{car.oem} {car.model}</h3>
+                  <p className="text-sm text-dark-500 mb-3">{car.variant_name || car.bodyType || ""}</p>
                   <div className="flex items-center gap-4 mb-4 text-sm text-dark-500">
-                    <span>{car.seats} Seats</span>
-                    <span>{car.fuel}</span>
-                    <span>{car.transmission}</span>
+                    {car.seating && <span>{car.seating} Seats</span>}
+                    {car.fuelType && <span>{car.fuelType}</span>}
+                    {car.transmission && <span>{car.transmission}</span>}
                   </div>
                   <div className="flex items-center justify-between pt-4 border-t border-dark-100">
                     <div>
-                      <span className="text-2xl font-bold text-primary-600">&#8377;{car.price.toLocaleString()}</span>
+                      <span className="text-2xl font-bold text-primary-600">&#8377;{(car.dailyRate || car.price || 0).toLocaleString()}</span>
                       <span className="text-sm text-dark-500">/day</span>
                     </div>
                   </div>
                 </div>
               </div>
-            ))}
+            )) : (
+              [1, 2, 3].map((i) => (
+                <div key={i} className="card animate-pulse">
+                  <div className="h-52 bg-dark-200 rounded-t-xl" />
+                  <div className="p-5 space-y-3">
+                    <div className="h-5 bg-dark-200 rounded w-3/4" />
+                    <div className="h-4 bg-dark-200 rounded w-1/2" />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
 
           <div className="text-center mt-12">
