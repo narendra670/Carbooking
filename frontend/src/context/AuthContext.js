@@ -40,7 +40,11 @@ export const AuthProvider = ({ children }) => {
 
   const toggleWishlist = async (carId) => {
     const { data } = await authAPI.updateWishlist(carId);
-    setUser(prev => ({ ...prev, wishlist: data.wishlist }));
+    setUser(prev => {
+      const updated = { ...prev, wishlist: data.wishlist };
+      localStorage.setItem('user', JSON.stringify(updated));
+      return updated;
+    });
     return data.wishlist;
   };
 

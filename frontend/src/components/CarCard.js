@@ -21,8 +21,14 @@ const CarCard = ({ car, showCompare = false, onCompareToggle, isCompared = false
   const handleWishlist = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (user) {
+    if (!user) {
+      window.location.href = '/login';
+      return;
+    }
+    try {
       await toggleWishlist(car.used_car_sku_id);
+    } catch (error) {
+      console.error('Failed to update wishlist:', error);
     }
   };
 

@@ -40,8 +40,14 @@ const CarDetailsPage = () => {
   }, [id]);
 
   const handleWishlist = async () => {
-    if (user) {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    try {
       await toggleWishlist(car.used_car_sku_id);
+    } catch (error) {
+      console.error('Failed to update wishlist:', error);
     }
   };
 
