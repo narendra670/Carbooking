@@ -4,8 +4,13 @@ import fallbackCars from './fallbackCars';
 const PRODUCTION_API_URL = 'https://carbooking-1-clao.onrender.com/api';
 
 const getApiUrl = () => {
-  if (process.env.REACT_APP_API_URL) {
-    return process.env.REACT_APP_API_URL;
+  let url = process.env.REACT_APP_API_URL;
+  if (url) {
+    url = url.replace(/\/$/, ''); // Remove trailing slash
+    if (!url.endsWith('/api')) {
+      url += '/api';
+    }
+    return url;
   }
   if (process.env.NODE_ENV === 'production') {
     return PRODUCTION_API_URL;
