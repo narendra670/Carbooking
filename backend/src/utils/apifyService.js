@@ -87,7 +87,23 @@ const fetchCarsFromApiify = async () => {
       return fallbackCars;
     }
 
-    return response.data.map(transformCarData);
+    const cars = response.data
+      .map((rawCar) => {
+        try {
+          return transformCarData(rawCar);
+        } catch (err) {
+          console.warn('Skipping invalid car record:', err.message);
+          return null;
+        }
+      })
+      .filter(Boolean);
+
+    if (cars.length === 0) {
+      console.warn('No valid cars from Apify, using fallback car data');
+      return fallbackCars;
+    }
+
+    return cars;
   } catch (error) {
     console.error('Error fetching cars from Apify:', error.message);
     console.warn('Using fallback car data');

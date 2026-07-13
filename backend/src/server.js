@@ -37,7 +37,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/drivers', driverRoutes);
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Car Booking API is running' });
+  res.json({ status: 'OK', message: 'Car Booking API is running', version: '1.1.0' });
 });
 
 const PORT = process.env.PORT || 5000;
