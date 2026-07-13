@@ -13,7 +13,21 @@ const driverRoutes = require('./routes/driverRoutes');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const allowed = [
+      'http://localhost:3000',
+      'https://carbooking-six.vercel.app',
+      process.env.FRONTEND_URL,
+    ].filter(Boolean);
+    if (allowed.includes(origin) || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+}));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);

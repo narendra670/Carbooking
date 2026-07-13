@@ -1,4 +1,5 @@
 const axios = require('axios');
+const fallbackCars = require('./fallbackCars');
 
 const APIFY_API_URL = process.env.APIFY_API_URL;
 const APIFY_TOKEN = process.env.APIFY_TOKEN;
@@ -70,15 +71,27 @@ const recommendPurpose = (bodyType) => {
 };
 
 const fetchCarsFromApiify = async () => {
+  if (!APIFY_API_URL || !APIFY_TOKEN) {
+    console.warn('Apify credentials missing, using fallback car data');
+    return fallbackCars;
+  }
+
   try {
     const response = await axios.get(APIFY_API_URL, {
       params: { token: APIFY_TOKEN },
+      timeout: 15000,
     });
-    const cars = response.data.map(transformCarData);
-    return cars;
+
+    if (!Array.isArray(response.data) || response.data.length === 0) {
+      console.warn('Apify returned no cars, using fallback car data');
+      return fallbackCars;
+    }
+
+    return response.data.map(transformCarData);
   } catch (error) {
     console.error('Error fetching cars from Apify:', error.message);
-    throw new Error('Failed to fetch cars from external API');
+    console.warn('Using fallback car data');
+    return fallbackCars;
   }
 };
 
